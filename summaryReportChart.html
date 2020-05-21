@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body {
+  font-family: Arial;
+	padding: 30px, 10px, 10px, 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+form.example input[type=text] {
+  padding: 10px;
+  font-size: 17px;
+  border: 1px solid grey;
+  float: left;
+  width: 80%;
+  background: #f1f1f1;
+}
+
+form.example button {
+  float: left;
+  width: 20%;
+  padding: 10px;
+  background: #2196F3;
+  color: white;
+  font-size: 17px;
+  border: 1px solid grey;
+  border-left: none;
+  cursor: pointer;
+}
+
+form.example button:hover {
+  background: #0b7dda;
+}
+
+form.example::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+</style>
+<script src="js/canvasjs.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script>
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+function drawChart(country_name, TotalDeaths, TotalRecovered, TotalConfirmed){
+	var chart = new CanvasJS.Chart("chartContainer", {
+		theme: "light2",
+		animationEnabled: true,
+		title: {
+			text: "COVID 19 Report on the basis of Country Name"
+		},
+		subtitles: [{
+			text: country_name,
+			fontSize: 16
+		}],
+		data: [{
+			type: "pie",
+			indexLabelFontSize: 18,
+			radius: 80,
+			indexLabel: "{label} - {y}",
+			yValueFormatString: "###0.0'%'",
+			click: explodePie,
+			dataPoints: [
+				{ y: TotalConfirmed, label: "Total Confirmed" },
+				{ y: TotalRecovered, label: "Total Recovered"},
+				{ y: TotalDeaths, label: "Total Death" }
+			]
+		}]
+	});
+	chart.render();
+
+}
+
+function explodePie(e) {
+	for(var i = 0; i < e.dataSeries.dataPoints.length; i++) {
+		if(i !== e.dataPointIndex)
+			e.dataSeries.dataPoints[i].exploded = false;
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////
+</script>
+</head>
+<body>
+		<h2>Enter the country Name and click search</h2>
+
+	<p></p>
+	<form class="example" id="searchForm" action="#">
+	  <input type="text" placeholder="Search.." id="country_name">
+	  <button type="submit"><i class="fa fa-search"></i></button>
+	</form>
+	<div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+	<div class="mypanel"></div>
+
+	    <script>
+			$('#searchForm').submit(function(e){
+				e.preventDefault();
+				var country_name = $('#country_name').val();
+				alert(country_name);
+				var link = 'https://api.covid19api.com/total/country/' + country_name;
+
+				$.ajax({
+								dataType: "json",
+								url: link,
+								success: function(data){
+												var TotalConfirmed = 0;
+												var TotalDeaths = 0;
+												var TotalRecovered = 0;
+												$.each(data, function(index, element) {
+														//alert(element.timeStamp);
+														TotalConfirmed += element.Confirmed;
+														TotalRecovered += element.Recovered;
+														TotalDeaths += element.Deaths;
+
+													});
+drawChart(country_name, TotalDeaths, TotalRecovered, TotalConfirmed);
+																				console.log(TotalDeaths);
+																				console.log(TotalConfirmed);
+																				console.log(TotalRecovered);
+
+											},
+								error: function(error){
+									alert("Country Does Not exit, Retry");
+									$('#country_name').focus();
+								}
+							});
+
+
+			});
+
+				</script>
+</div>
+</body>
+
+</html>

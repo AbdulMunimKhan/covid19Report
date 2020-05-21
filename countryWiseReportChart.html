@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+<script src="js/canvasjs.min.js"></script>
+<script src="js/jquery.min.js"></script>
+
+<div id="dataDiv"></div>
+
+
+<div class="mypanel"></div>
+
+    <script>
+    $.getJSON('https://api.covid19api.com/summary', function(data) {
+
+			console.log(data);
+        var text = `Total Confirmed: ${data.Global.TotalConfirmed}<br>
+                    Total Deaths: ${data.Global.TotalDeaths}<br>
+                    Total Recovered: ${data.Global.TotalRecovered}`
+				var TotalConfirmed = data.Global.TotalConfirmed;
+				var TotalDeaths= data.Global.TotalDeaths;
+        var TotalRecovered = data.Global.TotalRecovered;
+
+        $(".mypanel").html(text);
+
+				var chart = new CanvasJS.Chart("chartContainer", {
+					animationEnabled: true,
+					theme: "light2",
+					title:{
+						text: "COVID 19 Summary Report of the World"
+					},
+					axisY:{
+						includeZero: false
+					},
+					data: [{
+						type: "line",
+						dataPoints: [
+							{ y: parseInt(TotalConfirmed), indexLabel: "Total Confirmed",markerColor: "red", markerType: "triangle" },
+							{ y: parseInt(TotalRecovered) , indexLabel: "Total Recovered",markerColor: "DarkSlateGrey", markerType: "cross" },
+							{ y: parseInt(TotalDeaths),  indexLabel: "Total Death",markerColor: "red", markerType: "triangle"}
+						]
+					}]
+				});
+				chart.render();
+
+    });
+    </script>
+</body>
+
+</html>
